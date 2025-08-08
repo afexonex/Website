@@ -1,0 +1,503 @@
+<?php
+
+include('config.php');
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
+$sql = "SELECT username, credit, total_cc, usertype FROM users WHERE id = '$user_id' LIMIT 1";
+$result = mysqli_query($conn, $sql);
+
+if (mysqli_num_rows($result) > 0) {
+    $user = mysqli_fetch_assoc($result);
+    $username = $user['username'];
+    $credits = $user['credit'];
+    $total_cc = $user['total_cc'];
+    $usertype = $user['usertype'];
+} else {
+    session_destroy();
+    header("Location: login.php");
+    exit();
+}
+?>
+
+
+<script>
+    var userCredits = <?php echo $credits; ?>;  // Pass the credits from PHP to JavaScript
+</script>
+
+<!DOCTYPE html>
+
+
+<html lang="en" class="dark-style layout-navbar-fixed layout-menu-fixed layout-compact layout-menu-collapsed " dir="ltr" data-theme="theme-default" data-assets-path="./assets/" data-template="vertical-menu-template-dark">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+    <title>Collapsed menu - Layouts | Vuexy - Bootstrap Admin Template</title>
+
+    
+    <meta name="description" content="Start your development with a Dashboard for Bootstrap 5" />
+    <meta name="keywords" content="dashboard, bootstrap 5 dashboard, bootstrap 5 design, bootstrap 5">
+    <!-- Canonical SEO -->
+    <link rel="canonical" href="https://1.envato.market/vuexy_admin">
+    
+    
+    <!-- ? PROD Only: Google Tag Manager (Default ThemeSelection: GTM-5DDHKGP, PixInvent: GTM-5J3LMKC) -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-5J3LMKC');</script>
+    <!-- End Google Tag Manager -->
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./assets/img/favicon/favicon.ico" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&ampdisplay=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="./assets/vendor/fonts/fontawesome.css" />
+    <link rel="stylesheet" href="./assets/vendor/fonts/tabler-icons.css"/>
+    <link rel="stylesheet" href="./assets/vendor/fonts/flag-icons.css" />
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="./assets/vendor/css/rtl/core-dark.css" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="./assets/vendor/css/rtl/theme-default-dark.css" class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="./assets/css/demo.css" />
+    
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="./assets/vendor/libs/node-waves/node-waves.css" />
+    <link rel="stylesheet" href="./assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="./assets/vendor/libs/typeahead-js/typeahead.css" /> 
+    
+
+    <!-- Page CSS -->
+    
+
+    <!-- Helpers -->
+    <script src="./assets/vendor/js/helpers.js"></script>
+    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+    <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
+    <script src="./assets/vendor/js/template-customizer.js"></script>
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="./assets/js/config.js"></script>
+    
+</head>
+
+<body>
+
+  
+  <!-- ?PROD Only: Google Tag Manager (noscript) (Default ThemeSelection: GTM-5DDHKGP, PixInvent: GTM-5J3LMKC) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5DDHKGP" height="0" width="0" style="display: none; visibility: hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  
+  <!-- Layout wrapper -->
+<div class="layout-wrapper layout-content-navbar  ">
+  <div class="layout-container">
+
+    
+    
+
+
+
+
+<!-- Menu -->
+
+<?php include './headers/sidebar.php'; ?>
+<!-- / Menu -->
+
+    
+
+    <!-- Layout container -->
+    <div class="layout-page">
+      
+      
+<?php include './headers/nav.php'; ?>
+
+
+
+<!-- / Navbar -->
+
+      <div id="customToast" class="bs-toast toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1055; display: none;">
+    <div class="toast-header">
+        <i class="ti ti-bell ti-xs me-2 text-danger"></i>
+        <div class="me-auto fw-medium" id="toastTitle">Notification</div>
+        <small class="text-muted">Just now</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close" onclick="hideToast()"></button>
+    </div>
+    <div class="toast-body" id="toastBody">
+        Hello, world! This is a toast message.
+    </div>
+</div>
+
+      <!-- Content wrapper -->
+      <div class="content-wrapper">
+
+        <!-- Content -->
+        
+          <div class="container-xxl flex-grow-1 container-p-y">
+            
+            
+
+
+<!-- Layout Demo -->
+<div class="layout-demo-info">
+  <div class="alert alert-primary mt-4" role="alert">
+    <span class="fw-medium">Important:</span> Every check will cost 1 credit.
+  </div>
+</div>
+
+<div class="row">
+  <!-- Input + Controls -->
+  <div class="col-md-6">
+    <div class="card mb-4">
+      <div class="card-body">
+        <textarea id="card-input" placeholder="531463005xxxxxxxxxx|01|28|746" rows="8" class="form-control text-center mb-2"></textarea>
+
+        <select id="gate" class="form-control mb-2">
+          <option value="">SELECT GATE</option>
+          <option value="./Gate/pp.php">PayPal Charge $0.1</option>
+          <option value="./Gate/stripe1.php">Stripe Charge $1.00</option>
+          <option value="./Gate/br.php">Braintree Charge $8.50</option>
+          <option value="./Gate/shop.php">AutoShopify Rendom Charge </option>
+              
+          <!-- Add more checker files here -->
+        </select>
+
+        <div class="d-flex justify-content-between">
+          <button id="startBtn" class="btn btn-label-success" style="width: 45%;">
+            <i class="fa fa-play"></i> START
+          </button>
+          <button id="stopBtn" class="btn btn-label-danger text-black" style="width: 45%;" disabled>
+            <i class="fa fa-stop"></i> Pause
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Counters -->
+  <div class="col-md-6">
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Card Status</h5>
+        <ul class="list-group">
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Total cards <span class="badge bg-primary rounded-pill carregadas">0</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Live Cards <span class="badge bg-success rounded-pill aprovadas">0</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            DEAD Cards <span class="badge bg-danger rounded-pill reprovadas">0</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="col-md-6">
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Results</h5>
+        <ul class="nav nav-tabs nav-tabs-bordered d-flex" role="tablist">
+          <li class="nav-item flex-fill" role="presentation">
+            <button class="nav-link w-100 active" data-bs-toggle="tab" data-bs-target="#lives-section" type="button">Lives</button>
+          </li>
+          <li class="nav-item flex-fill" role="presentation">
+            <button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#dead-section" type="button">Dead</button>
+          </li>
+        </ul>
+        <div class="tab-content pt-2">
+          <div class="tab-pane fade show active" id="lives-section">
+            <div id="lista_aprovadas" class="results-list"></div>
+          </div>
+          <div class="tab-pane fade" id="dead-section">
+            <div id="lista_reprovadas" class="results-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Style -->
+<style>
+  .results-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: transparent;
+    font-family: monospace;
+    font-size: 14px;
+  }
+</style>
+
+<!-- JavaScript -->
+<script>
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const textarea = document.getElementById('card-input');
+  const gateSelect = document.getElementById('gate');
+
+  const lista_aprovadas = document.getElementById('lista_aprovadas');
+  const lista_reprovadas = document.getElementById('lista_reprovadas');
+  const carregadas = document.querySelector('.carregadas');
+  const aprovadas = document.querySelector('.aprovadas');
+  const reprovadas = document.querySelector('.reprovadas');
+
+  let isPaused = false;
+
+  startBtn.addEventListener('click', async () => {
+    const cards = textarea.value.trim().split('\n').filter(line => line.trim() !== '');
+    const gate = gateSelect.value;
+
+    if (!gate) {
+      alert('Please select a gateway.');
+      return;
+    }
+
+    let total = cards.length;
+    carregadas.textContent = total;
+    aprovadas.textContent = 0;
+    reprovadas.textContent = 0;
+
+    isPaused = false;
+    stopBtn.disabled = false;
+
+    for (let i = 0; i < cards.length; i++) {
+      if (isPaused) break;
+
+      const cc = cards[i].trim();
+
+      try {
+        const res = await fetch(gate, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'cc=' + encodeURIComponent(cc)
+        });
+
+        const data = await res.json();
+
+        const output = `[${data.gateway || 'N/A'}] ${data.card || cc} => ${data.message || 'No message'} (${data.time || '0s'})`;
+
+        if (data.status && data.status.includes('✅')) {
+          lista_aprovadas.innerHTML += `<div class="text-success">${output}</div>`;
+          aprovadas.textContent = parseInt(aprovadas.textContent) + 1;
+        } else {
+          lista_reprovadas.innerHTML += `<div class="text-danger">${output}</div>`;
+          reprovadas.textContent = parseInt(reprovadas.textContent) + 1;
+        }
+      } catch (err) {
+        lista_reprovadas.innerHTML += `<div class="text-warning">${cc} => Request failed</div>`;
+      }
+
+      await new Promise(r => setTimeout(r, 1000)); // Delay between checks (1s)
+    }
+
+    stopBtn.disabled = true;
+  });
+
+  stopBtn.addEventListener('click', () => {
+    isPaused = true;
+    stopBtn.disabled = true;
+  });
+</script>
+
+<!--/ Layout Demo -->
+
+
+          </div>
+          <!-- / Content -->
+
+          
+          
+
+<!-- Footer -->
+<?php include './headers/footer.php'; ?>
+<!-- / Footer -->
+
+          
+
+
+  
+
+  <!-- Core JS -->
+  <!-- build:js assets/vendor/js/core.js -->
+  
+  <script src="./assets/vendor/libs/jquery/jquery.js"></script>
+  <script src="./assets/vendor/libs/popper/popper.js"></script>
+  <script src="./assets/vendor/js/bootstrap.js"></script>
+  <script src="./assets/vendor/libs/node-waves/node-waves.js"></script>
+  <script src="./assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+  <script src="./assets/vendor/libs/hammer/hammer.js"></script>
+  <script src="./assets/vendor/libs/i18n/i18n.js"></script>
+  <script src="./assets/vendor/libs/typeahead-js/typeahead.js"></script>
+   <script src="./assets/vendor/js/menu.js"></script>
+  
+  <!-- endbuild -->
+
+  <!-- Vendors JS -->
+  
+  
+
+  <!-- Main JS -->
+  <script src="./assets/js/main.js"></script>
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.6/dist/sweetalert2.all.min.js"></script>
+<script>
+$(document).ready(function(){
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+    });
+
+    // Function to display toast with custom message
+    function showToast(title, message) {
+        $('#toastTitle').text(title);
+        $('#toastBody').text(message);
+        $('#customToast').fadeIn();
+        setTimeout(() => {
+            $('#customToast').fadeOut();
+        }, 3000); // Toast disappears after 3 seconds
+    }
+
+    // Copy Lives
+    $('.btn-copy').click(function(){
+        showToast('Copied!', 'The list has been copied successfully.');
+        var lista_lives = $('#lista_aprovadas').text();  // Get the text from approved lives
+        copyToClipboard(lista_lives);  // Use helper function to copy
+    });
+
+    // Clear Dead
+    $('.btn-trash').click(function(){
+        showToast('Cleared!', 'The dead list has been cleared.');
+        $('#lista_reprovadas').text('');  // Clear the dead list
+    });
+
+    // Process Cards Logic
+    $('.btn-play').click(function(){
+        var lista = $('.form-checker').val().trim();
+        var sec = $("#sec").val();
+        var e = document.getElementById("gate");
+        var gate = e.options[e.selectedIndex].value;
+        var array = lista.split('\n');
+        var charge = 0, lives = 0, dies = 0, testadas = 0, txt = '';
+
+        // Ensure user has enough credits
+        var totalCards = array.filter(function(value) { return value.trim() !== ""; }).length;
+
+        if (!lista) {
+            showToast('No Cards!', 'Please enter cards.');
+            return false;
+        }
+
+        if (userCredits <= 0) {
+            showToast('Insufficient Funds!', 'Your credits are insufficient. Please top up.');
+            return false;
+        }
+
+        // Ensure user has enough credits for the total number of cards
+        if (totalCards > userCredits) {
+            showToast('Not Enough Credits!', 'You need more credits to check all cards.');
+            return false;
+        }
+
+        showToast('Checking!', 'Processing started.');
+
+        var line = array.filter(function(value){
+            if (value.trim() !== "") {
+                txt += value.trim() + '\n';
+                return value.trim();
+            }
+        });
+
+        var total = line.length;
+        $('.carregadas').text(total);
+        $('.btn-play').attr('disabled', true);
+        $('.btn-stop').attr('disabled', false);
+
+        line.forEach(function(data){
+            var callBack = $.ajax({
+                url: gate + '?lista=' + data + '&sec=' + sec,
+                success: function(retorno){
+                    if (retorno.indexOf("AUTH") >= 0) {
+                        $('#lista_charge').append(retorno);
+                        removelinha();
+                        charge++;
+                    } else if (retorno.indexOf("Live") >= 0) {
+                        $('#lista_aprovadas').append(retorno);
+                        removelinha();
+                        lives++;
+                    } else {
+                        $('#lista_reprovadas').append(retorno);
+                        removelinha();
+                        dies++;
+                    }
+
+                    testadas = charge + lives + dies;
+                    $('.charge').text(charge);
+                    $('.aprovadas').text(lives);
+                    $('.reprovadas').text(dies);
+                    $('.testadas').text(testadas);
+
+                    // Deduct credits as cards are processed
+                    userCredits -= 1; // Deduct 1 credit per card processed
+                    $('#credits').text(userCredits); // Update the credits UI
+
+                    if (testadas == total) {
+                        showToast('Finished!', 'Processing has finished.');
+                        $('.btn-play').attr('disabled', false);
+                        $('.btn-stop').attr('disabled', true);
+                    }
+                }
+            });
+
+            // Stop button logic to abort the AJAX request
+            $('.btn-stop').click(function(){
+                showToast('Paused!', 'Processing has been paused.');
+                $('.btn-play').attr('disabled', false);
+                $('.btn-stop').attr('disabled', true);
+                callBack.abort();
+                return false;
+            });
+        });
+    });
+});
+
+// Helper function to remove the first line (used after processing a card)
+function removelinha() {
+    var lines = $('.form-checker').val().split('\n');
+    lines.splice(0, 1);  // Remove the first line
+    $('.form-checker').val(lines.join("\n"));
+}
+
+// Helper function to copy text to clipboard
+function copyToClipboard(text) {
+    var textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+}
+</script>
+</body>
+
+</html>
+
+<!-- beautify ignore:end -->
+

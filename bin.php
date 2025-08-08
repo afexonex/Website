@@ -1,0 +1,78 @@
+<?php
+if (isset($_POST['bin'])) {
+    $bin = substr($_POST['bin'], 0, 6); // First 6 digits
+    $url = "https://lookup.binlist.net/$bin";
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $headers = ['Accept-Version: 3'];
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    $result = curl_exec($ch);
+    curl_close($ch);
+
+    if ($result) {
+        $data = json_decode($result, true);
+    } else {
+        $error = "BIN lookup failed. Try again.";
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BIN Lookup</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f5f5f9;
+    }
+    .card {
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      <div class="card p-4">
+        <h3 class="text-center mb-4">🔍 BIN Lookup Tool</h3>
+        <form method="POST">
+          <div class="mb-3">
+            <label class="form-label">Enter BIN (first 6 digits)</label>
+            <input type="text" name="bin" class="form-control" placeholder="Eg: 414720" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Check BIN</button>
+        </form>
+
+        <?php if (isset($data)) : ?>
+          <div class="alert alert-success mt-4">
+            <h5>💳 BIN Info:</h5>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">💳 <strong>Scheme:</strong> <?= $data['scheme'] ?? 'N/A' ?></li>
+              <li class="list-group-item">🏦 <strong>Bank:</strong> <?= $data['bank']['name'] ?? 'N/A' ?></li>
+              <li class="list-group-item">🌍 <strong>Country:</strong> <?= $data['country']['name'] ?? 'N/A' ?> (<?= $data['country']['emoji'] ?? '' ?>)</li>
+              <li class="list-group-item">🏷️ <strong>Brand:</strong> <?= $data['brand'] ?? 'N/A' ?></li>
+              <li class="list-group-item">📱 <strong>Type:</strong> <?= $data['type'] ?? 'N/A' ?></li>
+              <li class="list-group-item">🔒 <strong>Prepaid:</strong> <?= $data['prepaid'] ? 'Yes' : 'No' ?></li>
+            </ul>
+          </div>
+        <?php elseif (isset($error)) : ?>
+          <div class="alert alert-danger mt-3"><?= $error ?></div>
+        <?php endif; ?>
+
+        <!-- Back to Dashboard Button -->
+        <a href="index.php" class="btn btn-outline-secondary mt-4 w-100">← Back to Dashboard</a>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+<?php
+if (!isset($_GET['url'])) {
+    echo json_encode(["error" => "No URL specified"]);
+    exit();
+}
+
+$url = $_GET['url'];
+
+// Optional security — only allow proxkamal.com calls
+if (strpos($url, "proxkamal.com") === false) {
+    echo json_encode(["error" => "Invalid URL"]);
+    exit();
+}
+
+$response = file_get_contents($url);
+
+if ($response === FALSE) {
+    echo json_encode(["error" => "Failed to fetch"]);
+} else {
+    header("Content-Type: application/json");
+    echo $response;
+}
+?>

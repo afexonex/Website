@@ -1,0 +1,147 @@
+<?php
+include('config.php');
+session_start();
+
+// Redirect if not logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
+// Fetch user data
+$sql = "SELECT username, credit, total_cc, usertype FROM users WHERE id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    $user = $result->fetch_assoc();
+    $username = $user['username'];
+    $credit = $user['credit'];
+    $total_cc = $user['total_cc'];
+    $usertype = $user['usertype'];
+} else {
+    session_destroy();
+    header("Location: login.php");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en" class="dark-style layout-navbar-fixed layout-menu-fixed layout-compact" dir="ltr" data-theme="theme-default" data-assets-path="./assets/" data-template="vertical-menu-template-dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Dashboard</title>
+  <link rel="icon" type="image/x-icon" href="./assets/img/favicon/favicon.ico" />
+  <link rel="stylesheet" href="./assets/vendor/fonts/fontawesome.css" />
+  <link rel="stylesheet" href="./assets/vendor/fonts/tabler-icons.css"/>
+  <link rel="stylesheet" href="./assets/vendor/css/rtl/core-dark.css" class="template-customizer-core-css" />
+  <link rel="stylesheet" href="./assets/vendor/css/rtl/theme-default-dark.css" class="template-customizer-theme-css" />
+  <link rel="stylesheet" href="./assets/css/demo.css" />
+  <link rel="stylesheet" href="./assets/vendor/libs/node-waves/node-waves.css" />
+  <link rel="stylesheet" href="./assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+  <link rel="stylesheet" href="./assets/vendor/libs/typeahead-js/typeahead.css" />
+  <link rel="stylesheet" href="./assets/vendor/libs/apex-charts/apex-charts.css" />
+  <script src="./assets/vendor/js/helpers.js"></script>
+  <script src="./assets/vendor/js/template-customizer.js"></script>
+  <script src="./assets/js/config.js"></script>
+</head>
+
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5DDHKGP" height="0" width="0" style="display: none; visibility: hidden"></iframe></noscript>
+
+<div class="layout-wrapper layout-content-navbar">
+  <div class="layout-container">
+
+    <!-- Sidebar -->
+    <?php include './headers/sidebar.php'; ?>
+    <!-- /Sidebar -->
+
+    <!-- Layout page -->
+    <div class="layout-page">
+
+      <!-- Navbar -->
+      <?php include './headers/nav.php'; ?>
+      <!-- /Navbar -->
+
+      <!-- Content wrapper -->
+      <div class="content-wrapper">
+
+        <!-- Content -->
+        <div class="container-xxl flex-grow-1 container-p-y">
+
+          <div class="col-md-6 col-xl-4 mb-4">
+            <div class="card h-100">
+              <div class="card-header d-flex justify-content-between">
+                <div class="card-title mb-0">
+                  <h5 class="mb-0">Important Notice:</h5>
+                  <h6 class="text-danger">1) Do not use Gen Cards</h6>
+                  <h6 class="text-danger">2) Use dumped cards Or Scrape cards</h6>
+                  <h6 class="text-danger">3) Every check will cost 1 credit</h6>
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="salesLastMonth"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+
+            <!-- Credits -->
+            <div class="col-xl-2 col-md-4 col-6 mb-4">
+              <div class="card">
+                <div class="card-body">
+                  <div class="badge p-2 bg-label-danger mb-2 rounded"><i class="ti ti-currency-dollar ti-md"></i></div>
+                  <h5 class="card-title mb-1 pt-2">Balance</h5>
+                  <small class="text-muted">Credits</small>
+                  <p class="text-success mb-2 mt-1"><?= htmlspecialchars($credit) ?></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total CC Checked -->
+            <div class="col-xl-2 col-md-4 col-6 mb-4">
+              <div class="card">
+                <div class="card-body">
+                  <div class="badge p-2 bg-label-info mb-2 rounded"><i class="ti ti-chart-bar ti-md"></i></div>
+                  <h5 class="card-title mb-1 pt-2">Total Cards</h5>
+                  <small class="text-muted">Checked Cards</small>
+                  <p class="mb-2 mt-1"><?= htmlspecialchars($total_cc) ?></p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <!-- /Content -->
+
+        <!-- Footer -->
+        <?php include './headers/footer.php'; ?>
+        <!-- /Footer -->
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Core JS -->
+<script src="./assets/vendor/libs/jquery/jquery.js"></script>
+<script src="./assets/vendor/libs/popper/popper.js"></script>
+<script src="./assets/vendor/js/bootstrap.js"></script>
+<script src="./assets/vendor/libs/node-waves/node-waves.js"></script>
+<script src="./assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+<script src="./assets/vendor/libs/hammer/hammer.js"></script>
+<script src="./assets/vendor/libs/i18n/i18n.js"></script>
+<script src="./assets/vendor/libs/typeahead-js/typeahead.js"></script>
+<script src="./assets/vendor/js/menu.js"></script>
+<script src="./assets/vendor/libs/apex-charts/apexcharts.js"></script>
+<script src="./assets/js/main.js"></script>
+<script src="./assets/js/dashboards-crm.js"></script>
+
+</body>
+</html>

