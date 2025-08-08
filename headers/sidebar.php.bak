@@ -1,0 +1,154 @@
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+
+  
+  <div class="app-brand demo ">
+    <a href="index.html" class="app-brand-link">
+      <span class="app-brand-logo demo">
+</span>
+      <span class="app-brand-text demo menu-text fw-bold">Blue Eye</span>
+    </a>
+
+    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
+      <i class="ti menu-toggle-icon d-none d-xl-block ti-sm align-middle"></i>
+      <i class="ti ti-x d-block d-xl-none ti-sm align-middle"></i>
+    </a>
+  </div>
+
+  <div class="menu-inner-shadow"></div>
+
+  
+  
+  <ul class="menu-inner py-1">
+    <!-- Dashboards -->
+<!-- Dashboards -->
+<li class="menu-item">
+      <a href="index.php" class="menu-link">
+        <i class="menu-icon tf-icons ti ti-smart-home"></i>
+        <div data-i18n="dashboard">Dashboard</div>
+      </a>
+    </li>
+    
+    <!-- Layouts -->
+<li class="menu-item">
+  <a href="javascript:void(0);" class="menu-link menu-toggle">
+    <i class="menu-icon tf-icons ti ti-id"></i>
+    <div data-i18n="Charge Gate">Charge gate</div>
+  </a>
+
+  <ul class="menu-sub">
+    <li class="menu-item">
+      <a href="charge.php" class="menu-link">
+        <div data-i18n="Charge Mass Check">Charge Mass Check</div>
+      </a>
+    </li>
+  </ul>
+</li>
+
+<!-- Front Pages -->
+<li class="menu-item">
+  <a href="javascript:void(0);" class="menu-link menu-toggle">
+    <i class="menu-icon tf-icons ti ti-id"></i>
+    <div data-i18n="Auth Gate">Auth gate</div>
+  </a>
+
+  <ul class="menu-sub">
+    <li class="menu-item">
+      <a href="auth.php" class="menu-link">
+        <div data-i18n="Auth Mass Checker">Auth Mass Checker</div>
+      </a>
+    </li>
+  </ul>
+</li>
+
+<!-- Self AutoShopify -->
+<li class="menu-item">
+  <a href="javascript:void(0);" class="menu-link menu-toggle">
+    <i class="menu-icon tf-icons ti ti-shopping-cart"></i>
+    <div data-i18n="Self AutoShopify">Self AutoShopify</div>
+  </a>
+
+  <ul class="menu-sub">
+    <li class="menu-item">
+      <a href="own.php" class="menu-link">
+        <div data-i18n="Own Site Checker">Own Site Checker</div>
+      </a>
+    </li>
+  </ul>
+</li>
+ <?php   if($usertype == "admin")
+    { ?>
+    <li class="menu-item">
+      <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons ti ti-id"></i>
+        <div data-i18n="Admin">Admin</div>
+      </a>
+
+      <ul class="menu-sub">
+
+        <li class="menu-item">
+          <a href="./admin/createkey.php" class="menu-link">
+            <div data-i18n="create Key">Create key</div>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./admin/users.php" class="menu-link">
+            <div data-i18n="Users">Users</div>
+          </a>
+        </li>
+        
+      </ul>
+    </li>
+    <?php } ?>
+  <ul class="menu-inner py-1">
+    <!-- Dashboards -->
+<li class="menu-item">
+      <a href="bin.php" class="menu-link">
+        <i class="menu-icon tf-icons ti ti-id"></i>
+        <div data-i18n="Bin Lookup">Bin Lookup</div>
+      </a>
+    </li>
+
+    <!-- Apps & Pages -->
+    <li class="menu-header small text-uppercase">
+      <span class="menu-header-text" data-i18n="Others">Others</span>
+    </li>
+        
+    <li class="menu-item">
+      <a href="redeem.php" class="menu-link">
+        <i class="menu-icon tf-icons ti ti-cards"></i>
+        <div data-i18n="Redeem Code">Redeem Code</div>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a href="maintenance.php" class="menu-link">
+        <i class="menu-icon tf-icons ti ti-settings"></i>
+        <div data-i18n="Api Key">Api Key</div>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a href="gen.php" class="menu-link">
+        <i class="menu-icon tf-icons ti ti-settings"></i>
+        <div data-i18n="Gen ">Gen</div>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a href="pricing.php" class="menu-link">
+        <i class="menu-icon tf-icons ti ti-pricing">$</i>
+        <div data-i18n="Pricing">Pricing</div>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a href="Profile.php" class="menu-link">
+        <i class="menu-icon tf-icons ti ti-users"></i>
+        <div data-i18n="Profile">Profile</div>
+      </a>
+    </li>
+
+
+    <!-- Components -->
+    
+  </ul>
+  
+  
+
+</aside>
