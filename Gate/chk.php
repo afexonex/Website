@@ -1,0 +1,62 @@
+<?php
+include('../config.php');
+session_start();
+header('Content-Type: application/json');
+
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['status' => 'error', 'message' => 'Not logged in']);
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
+// Fetch current credits
+$sql = "SELECT username, credit, total_cc, usertype FROM users WHERE id = '$user_id' LIMIT 1";
+$result = mysqli_query($conn, $sql);
+$user = mysqli_fetch_assoc($result);
+
+if (!$user || $user['credit'] <= 0) {
+    echo json_encode(['status' => 'error', 'message' => 'No credits left']);
+    exit();
+}
+// Deduct 1 credit
+$update = "UPDATE users SET credit = credit - 1 WHERE id = '$user_id'";
+
+mysqli_query($conn, $update);
+
+if (isset($_POST['cc'])) {
+    $cc = trim($_POST['cc']);
+    $api_url = "https://proxkamal.com/stripe.php?cc=" . urlencode($cc);
+
+    $start = microtime(true);
+    $response = @file_get_contents($api_url);
+    $end = microtime(true);
+    $time_taken = round($end - $start, 2);
+
+    $status = '𝗔𝗽𝗽𝗿𝗼𝘃𝗲𝗱 ✅';
+    $final_response = 'Your payment method added successfully.';
+
+    // Check for known decline/error patterns in the API response
+    if (
+        strpos($response, '{"error":"Error creating payment method"}') !== false ||
+        strpos($response, 'Your card number is incorrect.') !== false ||
+        strpos($response, 'Your card was declined.') !== false
+    ) {
+        $status = '𝗥𝗲𝗷𝗲𝗰𝘁𝗲𝗱 ❌';
+        $final_response = 'Your card was declined.';
+    }
+
+    echo json_encode([
+        'status' => $status,
+        'message' => $final_response,
+        'time' => $time_taken,
+        'raw' => $response
+    ]);
+
+} else {
+    echo json_encode([
+        'status' => 'Invalid Request',
+        'message' => 'No card provided.'
+    ]);
+}
+?>
